@@ -4,7 +4,6 @@ import numpy
 
 
 class Cell:
-
     def __init__(self, crop, center=[0, 0, 0]):
         ''' crop: array of cropped image '''
         self.data = crop
@@ -13,15 +12,13 @@ class Cell:
 
         ''' center: coordinate of center of cell in [X, Y, Z] format '''
         self.center = center
-        self.output_points = self.OutputPoints()
-
+        self.output_points = self.output_points()
 
     ''' showing image contained in cell '''
-    def Show(self):
+    def show(self):
         cv2.imshow('cell', self.data)
 
-
-    def OutputPoints(self):
+    def output_points(self):
         value = numpy.sum(self.data) / (self.Y_length*self.X_length)
         #print(value)
         shift_Y = self.Y_length / 10 # for having indipendents rows after cut
@@ -34,7 +31,6 @@ class Cell:
 
 
 class Pattern:
-
     def __init__(self, path, options):
         ''' options: size of cells, example:
             [[X_value, X_unit], [Y_value, Y_unit]] '''
@@ -43,18 +39,22 @@ class Pattern:
         self.X_length = len(self.image[0])
         self.Y_length = len(self.image)
 
+        self.crops = list() # list of all crops of image, like mosaic
         self.X_0 = 0
+        self.cell_X_length = None
+        self.cell_X_count = None
         self.Y_0 = 0
-        self.Analyse(self.image, options)
-        self.Cropper()
-        self.spline_points = self.RowPoints()
+        self.cell_Y_length = None
+        self.cell_Y_count = None
+        
+        self.analyse(self.image, options)
+        self.cropper()
+        self.spline_points = self.row_points()
 
-
-    def Show(self):
+    def show(self):
         cv2.imshow('image', self.image)
 
-
-    def Analyse(self, image, options):
+    def analyse(self, image, options):
         ''' X calculations '''
         X_val = options[0][0]
         X_unit = options[0][1]
@@ -77,9 +77,7 @@ class Pattern:
             self.cell_Y_count = int(self.Y_length / Y_val)
             self.Y_0 = (self.Y_length - self.cell_Y_count * Y_val) / 2
 
-
-    def Cropper(self):
-        self.crops = list()
+    def cropper(self):
         for j in range(self.cell_Y_count):
             row = list()
             for i in range(self.cell_X_count):
@@ -99,8 +97,7 @@ class Pattern:
                 row.append(new_cell)
             self.crops.append(row)
 
-
-    def RowPoints(self):
+    def row_points(self):
         result = list()
         for j in range(self.cell_Y_count):
             row = list()
@@ -131,10 +128,9 @@ class Pattern:
             row += row_backward
 
             result.append(row)
-        return result
+        return result        
             
-            
-    def Save(self):
+    def save(self):
         with open("pattern_points.txt", "w") as f:
             for row in range(self.cell_Y_count):
                 for point in self.spline_points[row]:
@@ -151,4 +147,4 @@ if __name__ == '__main__':
     
     #print(pat.crops[12][5].output_points)
     #print(pat.spline_points[0])
-    pat.Save()
+    pat.save()
