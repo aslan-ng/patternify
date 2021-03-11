@@ -1,4 +1,4 @@
-https://img.shields.io/github/license/aslan-ng/patternify
+<img alt="GitHub" src="https://img.shields.io/github/license/aslan-ng/patternify">
 
 # patternify
 Converting images to beautiful vector-based patterns, useful for 2D and 3D design.
