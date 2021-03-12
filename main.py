@@ -4,7 +4,7 @@ import numpy
 
 
 class Cell:
-    def __init__(self, crop, center=[0, 0, 0]):
+    def __init__(self, crop, center=[0, 0]):
         ''' crop: array of cropped image '''
         self.data = crop
         self.Y_length = len(self.data)
@@ -25,8 +25,8 @@ class Cell:
         delta_Y = (((255-value) / 255) * (self.Y_length/2 - shift_Y))
         if delta_Y < self.Y_length / 20:
             delta_Y = self.Y_length / 20
-        foreward_point = [self.center[0], self.center[1] + delta_Y, self.center[2]]
-        backward_point = [self.center[0], self.center[1] - delta_Y, self.center[2]]
+        foreward_point = [self.center[0], self.center[1] + delta_Y]
+        backward_point = [self.center[0], self.center[1] - delta_Y]
         return [foreward_point, backward_point]
 
 
@@ -83,7 +83,7 @@ class Pattern:
             for i in range(self.cell_X_count):
                 X_center = (self.cell_X_length/2) + i*self.cell_X_length + self.X_0
                 Y_center = (self.cell_Y_length/2) + j*self.cell_Y_length + self.Y_0
-                center = [X_center, Y_center, 0]
+                center = [X_center, Y_center]
 
                 X_start = int(i*self.cell_X_length)
                 X_end = int((i+1)*self.cell_X_length)
@@ -107,7 +107,7 @@ class Pattern:
             first_cell = self.crops[j][0]
             first_point_X = first_cell.center[0] - first_cell.X_length/2
             first_point_Y = first_cell.center[1]
-            first_point = [first_point_X, first_point_Y, 0]
+            first_point = [first_point_X, first_point_Y]
             row_forward.append(first_point)
             row_backward.append(first_point)
             
@@ -118,7 +118,7 @@ class Pattern:
             last_cell = self.crops[j][-1]
             last_point_X = last_cell.center[0] + last_cell.X_length/2
             last_point_Y = last_cell.center[1]
-            last_point = [last_point_X, last_point_Y, 0]
+            last_point = [last_point_X, last_point_Y]
             row_forward.append(last_point)
             row_backward.append(last_point)
             
@@ -126,16 +126,43 @@ class Pattern:
 
             row_backward.reverse()
             row += row_backward
+            #print(row)
 
             result.append(row)
         return result        
             
-    def save(self):
-        with open("pattern_points.txt", "w") as f:
-            for row in range(self.cell_Y_count):
-                for point in self.spline_points[row]:
-                    f.write("%f,%f,%f\n" % (point[0], point[1], point[2]))
-                f.write("&\n")
+    def save(self, mode='txt'):
+        if mode == 'txt':
+            with open("pattern_points.txt", "w") as f:
+                for row in range(self.cell_Y_count):
+                    for point in self.spline_points[row]:
+                        f.write("%f,%f,%f\n" % (point[0], point[1], 0))
+                    f.write("&\n")
+        elif mode == 'svg':
+            import svgwrite
+            dwg = svgwrite.Drawing('pattern.svg', profile='tiny')
+            stroke = "#000"
+            fill = "#ffffff"
+            stroke_width = 1
+            stroke_linejoin="round"
+            stroke_linecap="round"
+            for i in range(self.cell_Y_count):
+                #print (self.spline_points[i])
+                points = list()
+                for j in range(len(self.spline_points[i])):
+                    #print (self.spline_points[i][j])
+                    points.append((self.spline_points[i][j][0], self.spline_points[i][j][1]))
+                dwg.add(
+                    dwg.polyline(
+                        points=points,
+                        stroke=stroke,
+                        fill=fill,
+                        stroke_width=stroke_width,
+                        stroke_linejoin=stroke_linejoin,
+                        stroke_linecap=stroke_linecap
+                        )
+                    )
+            dwg.save()    
 
 
 if __name__ == '__main__':
@@ -144,7 +171,5 @@ if __name__ == '__main__':
 
     options = [[50, 'count'], [65, 'count']]
     pat = Pattern(img_path, options)
-    
-    #print(pat.crops[12][5].output_points)
-    #print(pat.spline_points[0])
-    pat.save()
+    pat.save(mode='svg')
+    pat.save(mode='txt')
