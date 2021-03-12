@@ -12,13 +12,13 @@ class Cell:
 
         ''' center: coordinate of center of cell in [X, Y, Z] format '''
         self.center = center
-        self.output_points = self.output_points()
+        self.output_points = self.output_points_generator()
 
     ''' showing image contained in cell '''
     def show(self):
         cv2.imshow('cell', self.data)
 
-    def output_points(self):
+    def output_points_generator(self):
         value = numpy.sum(self.data) / (self.Y_length*self.X_length)
         #print(value)
         shift_Y = self.Y_length / 10 # for having indipendents rows after cut
@@ -133,14 +133,14 @@ class Pattern:
             
     def save(self, mode='txt'):
         if mode == 'txt':
-            with open("pattern_points.txt", "w") as f:
+            with open("result/pattern_points.txt", "w") as f:
                 for row in range(self.cell_Y_count):
                     for point in self.spline_points[row]:
                         f.write("%f,%f,%f\n" % (point[0], point[1], 0))
                     f.write("&\n")
         elif mode == 'svg':
             import svgwrite
-            dwg = svgwrite.Drawing('pattern.svg', profile='tiny')
+            dwg = svgwrite.Drawing('result/pattern.svg', profile='tiny')
             stroke = "#000"
             fill = "#ffffff"
             stroke_width = 1
@@ -167,7 +167,8 @@ class Pattern:
 
 if __name__ == '__main__':
     ROOT = os.getcwd()
-    img_path = os.path.join(ROOT, "input.jpg")
+    path = os.path.join(ROOT, 'input')
+    img_path = os.path.join(path, 'image.jpg')
 
     options = [[50, 'count'], [65, 'count']]
     pat = Pattern(img_path, options)
