@@ -1,4 +1,4 @@
-from filters.linear_filter import Cell, Pattern 
+from filters.linear_filter import Pattern 
 
 
 if __name__ == '__main__':

@@ -80,7 +80,7 @@ class Pattern(PatternObject):
             
     def save(self, mode='txt'):
         if mode == 'txt':
-            with open("result/pattern_points.txt", "w") as f:
+            with open("result/pattern.txt", "w") as f:
                 for row in range(self.cell_Y_count):
                     for point in self.spline_points[row]:
                         f.write("%f,%f,%f\n" % (point[0], point[1], 0))
