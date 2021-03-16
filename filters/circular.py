@@ -10,13 +10,13 @@ class Cell(CellObject):
     def output_points_generator(self):
         value = numpy.sum(self.data) / (self.Y_length*self.X_length)
         #print(value)
-        shift_Y = self.Y_length / 10 # for having indipendent rows after cutting real piece
-        delta_Y = (((255-value) / 255) * (self.Y_length/2 - shift_Y))
-        if delta_Y < self.Y_length / 20:
-            delta_Y = self.Y_length / 20
-        foreward_point = [self.center[0], self.center[1] + delta_Y]
-        backward_point = [self.center[0], self.center[1] - delta_Y]
-        result = [foreward_point, backward_point]
+        min_gap = self.Y_length / 10 # minimum gap with the neighbour row
+        radius = (((255-value) / 255) * (self.Y_length/2 - min_gap))
+        min_radius = self.Y_length / 20
+        if radius < min_radius: # minimum radius size
+            radius = min_radius
+        center = [self.center[0], self.center[1]]
+        result = [center, radius]
         return result
 
 
