@@ -47,47 +47,23 @@ class Pattern(PatternObject):
     def row_points(self):
         result = list()
         for j in range(self.cell_Y_count):
-            row = list()
-            row_forward = list()
-            row_backward = list()
-
-            first_cell = self.crops[j][0]
-            first_point_X = first_cell.center[0] - first_cell.X_length/2
-            first_point_Y = first_cell.center[1]
-            first_point = [first_point_X, first_point_Y]
-            row_forward.append(first_point)
-            row_backward.append(first_point)
-            
+            row = list()            
             for i in range(self.cell_X_count):
-                row_forward.append(self.crops[j][i].output_points[0])
-                row_backward.append(self.crops[j][i].output_points[1])
-
-            last_cell = self.crops[j][-1]
-            last_point_X = last_cell.center[0] + last_cell.X_length/2
-            last_point_Y = last_cell.center[1]
-            last_point = [last_point_X, last_point_Y]
-            row_forward.append(last_point)
-            row_backward.append(last_point)
-            
-            row += row_forward
-
-            row_backward.reverse()
-            row += row_backward
+                row.append(self.crops[j][i].output_points)
             #print(row)
-
             result.append(row)
         return result        
             
     def save(self, mode='txt'):
         if mode == 'txt':
-            with open("result/pattern.txt", "w") as f:
+            with open("result/pattern_circular.txt", "w") as f:
                 for row in range(self.cell_Y_count):
                     for point in self.spline_points[row]:
-                        f.write("%f,%f,%f\n" % (point[0], point[1], 0))
+                        f.write("%f,%f,%f\n" % (point[0][0], point[0][1], point[1]))
                     f.write("&\n")
         elif mode == 'svg':
             import svgwrite
-            dwg = svgwrite.Drawing('result/pattern.svg', profile='tiny')
+            dwg = svgwrite.Drawing('result/pattern_circular.svg', profile='tiny')
             stroke = "#000"
             fill = "#ffffff"
             stroke_width = 1
@@ -95,18 +71,19 @@ class Pattern(PatternObject):
             stroke_linecap="round"
             for i in range(self.cell_Y_count):
                 #print (self.spline_points[i])
-                points = list()
                 for j in range(len(self.spline_points[i])):
                     #print (self.spline_points[i][j])
-                    points.append((self.spline_points[i][j][0], self.spline_points[i][j][1]))
-                dwg.add(
-                    dwg.polyline(
-                        points=points,
-                        stroke=stroke,
-                        fill=fill,
-                        stroke_width=stroke_width,
-                        stroke_linejoin=stroke_linejoin,
-                        stroke_linecap=stroke_linecap
+                    center = self.spline_points[i][j][0]
+                    radius = self.spline_points[i][j][1]
+                    dwg.add(
+                        dwg.circle(
+                            center=center,
+                            r=radius,
+                            stroke=stroke,
+                            fill=fill,
+                            stroke_width=stroke_width,
+                            stroke_linejoin=stroke_linejoin,
+                            stroke_linecap=stroke_linecap
+                            )
                         )
-                    )
             dwg.save()
