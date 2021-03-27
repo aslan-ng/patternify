@@ -23,6 +23,7 @@ class Cell(CellObject):
 class Pattern(PatternObject):
     def __init(self, path, options):
         super().__init__(path, options)
+        self.cells = self.row_points()
 
     def cropper(self):
         for j in range(self.cell_Y_count):
@@ -52,13 +53,13 @@ class Pattern(PatternObject):
                 row.append(self.crops[j][i].output_points)
             #print(row)
             result.append(row)
-        return result        
+        self.cells = result        
             
     def save(self, mode='txt'):
         if mode == 'txt':
             with open("result/pattern_circular.txt", "w") as f:
                 for row in range(self.cell_Y_count):
-                    for point in self.spline_points[row]:
+                    for point in self.cells[row]:
                         f.write("%f,%f,%f\n" % (point[0][0], point[0][1], point[1]))
                     f.write("&\n")
         elif mode == 'svg':
@@ -70,11 +71,11 @@ class Pattern(PatternObject):
             stroke_linejoin="round"
             stroke_linecap="round"
             for i in range(self.cell_Y_count):
-                #print (self.spline_points[i])
-                for j in range(len(self.spline_points[i])):
-                    #print (self.spline_points[i][j])
-                    center = self.spline_points[i][j][0]
-                    radius = self.spline_points[i][j][1]
+                #print (self.cells[i])
+                for j in range(len(self.cells[i])):
+                    #print (self.cells[i][j])
+                    center = self.cells[i][j][0]
+                    radius = self.cells[i][j][1]
                     dwg.add(
                         dwg.circle(
                             center=center,

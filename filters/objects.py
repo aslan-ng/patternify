@@ -38,9 +38,11 @@ class PatternObject:
         
         self.analyse(self.image, options)
         self.cropper()
-        self.spline_points = self.row_points()
+        self.row_points()
+        '''self.spline_points = self.row_points()'''
 
     def row_points(self):
+        self.cells = None
         return None
 
     def show(self):

@@ -77,13 +77,14 @@ class Pattern(PatternObject):
             #print(row)
 
             result.append(row)
-        return result        
+            self.cells = result
+        #return result        
             
     def save(self, mode='txt'):
         if mode == 'txt':
             with open("result/pattern_linear.txt", "w") as f:
                 for row in range(self.cell_Y_count):
-                    for point in self.spline_points[row]:
+                    for point in self.cells[row]:
                         f.write("%f,%f,%f\n" % (point[0], point[1], 0))
                     f.write("&\n")
         elif mode == 'svg':
@@ -95,11 +96,11 @@ class Pattern(PatternObject):
             stroke_linejoin="round"
             stroke_linecap="round"
             for i in range(self.cell_Y_count):
-                #print (self.spline_points[i])
+                #print (self.cells[i])
                 points = list()
-                for j in range(len(self.spline_points[i])):
-                    #print (self.spline_points[i][j])
-                    points.append((self.spline_points[i][j][0], self.spline_points[i][j][1]))
+                for j in range(len(self.cells[i])):
+                    #print (self.cells[i][j])
+                    points.append((self.cells[i][j][0], self.cells[i][j][1]))
                 dwg.add(
                     dwg.polyline(
                         points=points,
